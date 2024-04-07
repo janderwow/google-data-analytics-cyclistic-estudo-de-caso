@@ -1,8 +1,20 @@
-<h1 align="center">Estudo de caso: Análise de dados Cyclistic
-</h1>
-<p align="center">Projeto final de Data Analytics do Google</p>
+<!DOCTYPE html>
+<html>
+<body>
+<h1 align="center">Estudo de caso: Análise de dados Cyclistic</h1>
+<hr>
+<p align="center">Projeto final Data Analytics do Google</p>
 
-<h4 align="left"> 
-	Autor: Jander de Melo
-	Data: 06/04/2024
-</h4>
+<h5 align="left"> 
+	<p>Autor: Jander de Melo</p>
+	<p>Data: 06/04/2024</p>
+</h5>
+
+<p>Treinamento profissional desenvolvido pelo Google ao longo de oito cursos. Algumas habilidades aprendidas foram práticas e processos utilizados por um analista de dados júnior, limpeza e organização de dados completando a análise com planilhas, SQL, R e como vizualizar e apresentar descobertas de dados em painéis usados com frequencia. 
+<a href="https://www.coursera.org/professional-certificates/analise-de-dados-do-google">(Referência) </a></p>
+
+<p>Para responder as perguntas de negócio segui as etapas do processo de análise de dados: perguntar, preparar, processar, analisar, compartilhar.<p/>
+</body>
+</html>
+
+
