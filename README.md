@@ -5,10 +5,6 @@
 <hr>
 <p align="center">Projeto final Data Analytics do Google</p>
 
-<h5 align="left"> 
-	<p>Autor: Jander de Melo</p>
-	<p>Data: 06/04/2024</p>
-</h5>
 
 <p>Treinamento profissional desenvolvido pelo Google ao longo de oito cursos. Algumas habilidades aprendidas foram práticas e processos utilizados por um analista de dados júnior, limpeza e organização de dados completando a análise com planilhas, SQL, R e como vizualizar e apresentar descobertas de dados em painéis usados com frequencia. 
 <a href="https://www.coursera.org/professional-certificates/analise-de-dados-do-google">(Fonte) </a></p>
