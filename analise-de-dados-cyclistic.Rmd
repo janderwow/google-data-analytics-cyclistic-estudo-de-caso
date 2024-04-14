@@ -1,0 +1,265 @@
+---
+title: "Análise de compartilhamento de bicicletas Cyclistic"
+author: "Jander"
+date: "14-04-2024"
+output: html_document
+---
+
+# Estudo de caso Cyclistic
+
+#### **Cenário**
+
+**Cyclistic**: Um programa de compartilhamento de bicicletas que conta com mais de 5.800 bicicletas e 600 estações de compartilhamento. A Cyclistic se diferencia por também oferecer bicicletas reclináveis, triciclos manuais e bicicletas de carga, tornando o compartilhamento de mais inclusivo para pessoas com deficiência e ciclistas que não podem usar uma bicicleta padrão de duas rodas. A maioria dos ciclistas opta por bicicletas tradicionais; cerca de 8% dos motociclistas usam as opções assistivas. Os usuários da Cyclistic são mais propensos a pedalar por lazer, mas cerca de 30% utilizam as bicicletas para se deslocarem ao trabalho diariamente.
+
+Os clientes que adquirem passes de viagem única ou de dia inteiro são chamados de passageiros casuais. 
+
+
+Lily Moreno(Diretora de Marketing) estabeleceu um objetivo claro: criar estratégias de marketing destinadas a converter passageiros casuais em membros anuais. Para fazer isso, no entanto, a equipe de analistas de marketing precisa entender melhor como os membros anuais e os passageiros casuais diferem, por que os passageiros casuais iriam querer adquirir um plano e como a mídia digital poderia afetar suas táticas de marketing.
+\
+\
+
+#### **Perguntar:**
+
+##### **Partes Interessadas**
+
+**Lily Moreno**: Diretora de marketing e gerente. Responsável pelo desenvolvimento de campanhas e iniciativas de promoção do programa de compartilhamento de bicicletas.
+
+**Equipe de análise de marketing da Cyclistic**: Uma equipe de analistas de dados responsáveis por coletar, analisar e relatar dados que ajudam a orientar a estratégia de marketing da Cyclistic. 
+
+**Equipe executiva da Cyclistic**: A equipe executiva notoriamente detalhista decidirá se aprova o programa de marketing recomendado.
+
+**Tarefa de negócios**
+
+Entender como os membros anuais e casuais se diferem.
+
+**Qual problema estou tentando resolver?**
+
+Por que os passageiros casuais iriam querer adquirir um plano e como a mídia digital poderia afetar táticas de marketing.
+
+
+#### **Preparar:**
+
+Onde os dados estão localizados?
+Os arquivos estão sãos em um servidor remoto [(aqui)](https://divvy-tripdata.s3.amazonaws.com/index.html) e fornecido por Motivate International Inc.
+
+Foram feitos os downloads dos arquivos Cyclistic em formato csv e armazenados em meu desktop organizados por data. Não foram identificados viéses de credibilidade.
+
+**Licença para uso dos dados**:
+
+https://ride.divvybikes.com/data-license-agreement
+
+
+#### **Processar:**
+
+A ferramenta que escolhi no processamento dos dados foi R para colocar em prática o conteúdo ensinado no curso. Os arquivos contém dados do ano de 2022.
+
+**Carregando e instalando pacotes necessários**
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require("knitr")
+opts_knit$set(root.dir = "C:/Users/jande/Documentos/estudo_de_caso/datasets")
+options(scipen=999)
+```
+
+```{r carregando pacotes, , results='hide', message=FALSE}
+installed.packages("tidyverse")
+installed.packages("lubridate")
+installed.packages("ggplot2")
+
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+
+```
+
+
+
+Antes de unir os arquivos em um único dataframe comparei o nome das colunas de todos os arquivos.
+```{r comparando nomes de colunas}
+
+trips01 <- read.csv("202201-divvy-tripdata.csv")
+trips02 <- read.csv("202202-divvy-tripdata.csv")
+trips03 <- read.csv("202203-divvy-tripdata.csv")
+trips04 <- read.csv("202204-divvy-tripdata.csv")
+trips05 <- read.csv("202205-divvy-tripdata.csv")
+trips06 <- read.csv("202206-divvy-tripdata.csv")
+trips07 <- read.csv("202207-divvy-tripdata.csv")
+trips08 <- read.csv("202208-divvy-tripdata.csv")
+trips09 <- read.csv("202209-divvy-tripdata.csv")
+trips10 <- read.csv("202210-divvy-tripdata.csv")
+trips11 <- read.csv("202211-divvy-tripdata.csv")
+trips12 <- read.csv("202212-divvy-tripdata.csv")
+
+
+colnames(trips01)
+colnames(trips02)
+colnames(trips03)
+colnames(trips04)
+colnames(trips05)
+colnames(trips06)
+colnames(trips07)
+colnames(trips08)
+colnames(trips09)
+colnames(trips10)
+colnames(trips11)
+colnames(trips12)
+```
+
+**Unindo arquivos em um único dafa frame**   
+```{r unindo csvs em um único, message=FALSE}
+
+all_trips <- list.files(path='C:/Users/jande/Documentos/Estudo de Caso/datasets/trip_files/divvy_tripdata_2022') %>% 
+  lapply(read_csv) %>% 
+  bind_rows
+```
+
+**Data Cleaning e preparação para análise**
+
+```{r inspecionando nova tabela}
+# Nome de colunas
+colnames(all_trips)
+# Número de linhas
+nrow(all_trips)
+# Dimensoes do df
+dim(all_trips) 
+# 6 primeiras linhas do df
+head(all_trips)
+# Lista de colunas e tipos de dado
+str(all_trips) 
+# resumo estatistico dos dados
+summary(all_trips) 
+# Vizualisado colunas
+glimpse(all_trips)
+```
+
+**Buscando possíveis erros de digitação**
+```{r buscando possiveis erros de digitacao}
+table(all_trips$member_casual)
+table(all_trips$rideable_type)
+```
+**Adicionando colunas para agregações futuras**
+```{r adicionando colunas de datas}
+all_trips$date <- as.Date(all_trips$started_at)
+all_trips$month <- format(as.Date(all_trips$date), "%m")
+all_trips$day <- format(as.Date(all_trips$date), "%d")
+all_trips$year <- format(as.Date(all_trips$date), "%Y")
+all_trips$day_of_week <- format.Date(as.Date(all_trips$date), "%A")
+```
+
+**Verificando e removendo valores nulos**
+```{r verificando valores nulos}
+sum(is.na(all_trips))
+all_trips_v2 <- all_trips %>% drop_na()
+sum(is.na(all_trips_v2))
+```
+
+**Adicionando duração do passeio em segundos**
+```{r passeio em segundo}
+all_trips_v2$duracao_passeio <- difftime(all_trips_v2$ended_at, all_trips_v2$started_at)
+```
+
+**Convertendo duracao_passeio para numérico**
+```{r convertendo duracao para numerico}
+all_trips_v2$duracao_passeio <- as.numeric(as.character(all_trips_v2$duracao_passeio))
+is.numeric(all_trips_v2$duracao_passeio)
+```
+
+**Removendo duracao_passeio negativa**
+```{r removendo duracao_passeio negativa}
+all_trips_v2 <- all_trips_v2[!(all_trips_v2$start_station_name == "HQ QR" | all_trips_v2$duracao_passeio<0),]
+
+```
+
+**Análise Descritiva**
+```{r analise descritiva}
+mean(all_trips_v2$duracao_passeio)
+median(all_trips_v2$duracao_passeio)
+max(all_trips_v2$duracao_passeio)
+min(all_trips_v2$duracao_passeio)
+
+# As linhas acima podem ser resumidas utilizando "summary"
+summary(all_trips_v2$duracao_passeio)
+```
+
+**Comparando membros e usuários casuais**
+```{r membros vs casuais}
+aggregate(all_trips_v2$duracao_passeio ~ all_trips_v2$member_casual, FUN = mean)
+aggregate(all_trips_v2$duracao_passeio ~ all_trips_v2$member_casual, FUN = median)
+aggregate(all_trips_v2$duracao_passeio ~ all_trips_v2$member_casual, FUN = max)
+aggregate(all_trips_v2$duracao_passeio ~ all_trips_v2$member_casual, FUN = min)
+```
+
+**Média de duração de passeios por dia membros vs usuários casuais**
+```{r ordenando dias da semana}
+# Ordenando dias da semana
+all_trips_v2$day_of_week <- ordered(all_trips_v2$day_of_week, levels=c("domingo", "segunda-feira", "terça-feira", "quarta-feira", "quinta-feira", "sexta-feira", "sábado"))
+```
+
+```{r media por dia membros vs usuarios casuais}
+aggregate(all_trips_v2$duracao_passeio ~ all_trips_v2$member_casual + all_trips_v2$day_of_week, FUN = mean)
+```
+
+**Média duração de passeio por tipo de bicicleta e dia da semana**
+```{r media por dia por tipo de passeio}
+aggregate(all_trips_v2$duracao_passeio ~ all_trips_v2$rideable_type + all_trips_v2$day_of_week, FUN = mean)
+```
+**Construindo vizualizações com ggplot2**
+
+**Média de passeios por tipo de membro e dia da semana**
+```{r plot passeios dia da semana membros vs casuais}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(qtd_passeios = n()
+            ,average_duration = mean(duracao_passeio)) %>% 
+  arrange(member_casual, weekday)  %>% 
+  ggplot(aes(x = weekday, y = qtd_passeios, fill = member_casual)) +
+  geom_col(position = "dodge")
+```
+
+**Média de duração de passeios por dia da semana**
+```{r vizualizacao media de duracao de viagem por dia da semana}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n()
+            ,duraçao_média = mean(duracao_passeio)) %>% 
+  arrange(member_casual, weekday)  %>% 
+  ggplot(aes(x = weekday, y = duraçao_média, fill = member_casual)) +
+  geom_col(position = "dodge")
+
+```
+
+
+**Exportando para csv**
+
+write.csv(all_trips_v2, "C:\\Users\\jande\\Documentos\\estudo_de_caso\\divvy_trip_data_2022.csv", row.names=FALSE)
+
+#### **Compartilhar:**
+
+A ferramenta que escolhi para compartilhamento foi Qlik Sense Desktop pois já tive contato profissional com o mesmo.
+O Processo de ETL neste caso não envolveu ligações entre qvds diferentes por se tratar somente de um único arquivo csv.
+
+
+```{r dashboard qlik sense, fig.alt = "Dashboard Qlik Sense Desktop Passeios Clyclistics.", echo=FALSE}
+knitr::include_graphics(path ="C:/Users/jande/Documentos/estudo_de_caso/assets/qlik-sense-passeios-cyclistic.png", error = FALSE)
+```
+\
+\
+
+
+#### **Agir:**
+
+#### Conclusão
+
+Membros anuais utilizam mais vezes o serviço porém membros casuais têm duração de passeios maior.
+
+Suas três principais recomendações com base em sua análise:
+
+* Programa de fidelidade para membros casuais pelo tempo de uso.
+
+* Promoções de início de semana pois o número de corridas diminui.
+
+* Aplicar pesquisas de satisfação com clientes e fazer uma nova comparação com os novos dados.
+
+Todas as recomendações devem ser trabalhadas junto as partes interessadas.
