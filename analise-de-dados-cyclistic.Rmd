@@ -2,7 +2,9 @@
 title: "Análise de compartilhamento de bicicletas Cyclistic"
 author: "Jander"
 date: "14-04-2024"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 # Estudo de caso Cyclistic
@@ -61,10 +63,12 @@ opts_knit$set(root.dir = "C:/Users/jande/Documentos/estudo_de_caso/datasets")
 options(scipen=999)
 ```
 
-```{r carregando pacotes, , results='hide', message=FALSE}
-installed.packages("tidyverse")
-installed.packages("lubridate")
-installed.packages("ggplot2")
+```{r carregando pacotes, warning=FALSE, results='hide', message=FALSE, echo=FALSE}
+install.packages("tidyverse",repos = "http://cran.us.r-project.org")
+install.packages("lubridate",repos = "http://cran.us.r-project.org")
+install.packages("ggplot2",repos = "http://cran.us.r-project.org")
+install.packages("tinytex",repos = "http://cran.us.r-project.org")
+tinytex::install_tinytex(force = TRUE)
 
 library(tidyverse)
 library(lubridate)
@@ -236,7 +240,8 @@ all_trips_v2 %>%
 write.csv(all_trips_v2, "C:\\Users\\jande\\Documentos\\estudo_de_caso\\divvy_trip_data_2022.csv", row.names=FALSE)
 
 #### **Compartilhar:**
-
+\
+\
 A ferramenta que escolhi para compartilhamento foi Qlik Sense Desktop pois já tive contato profissional com o mesmo.
 O Processo de ETL neste caso não envolveu ligações entre qvds diferentes por se tratar somente de um único arquivo csv.
 
@@ -251,7 +256,8 @@ knitr::include_graphics(path ="C:/Users/jande/Documentos/estudo_de_caso/assets/q
 #### **Agir:**
 
 #### Conclusão
-
+\
+\
 Membros anuais utilizam mais vezes o serviço porém membros casuais têm duração de passeios maior.
 
 Suas três principais recomendações com base em sua análise:
